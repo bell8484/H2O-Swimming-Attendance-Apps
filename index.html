@@ -1,0 +1,3385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>H2O Swimming Class Attendance System</title>
+  <!-- Google Font: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-light: #e0f2fe;
+      --accent: #06b6d4;
+      --navy-900: #0b192c;
+      --navy-800: #132a4a;
+      --navy-700: #1e3e62;
+      --bg-body: #f3f7fb;
+      --surface: #ffffff;
+      --surface-subtle: #f8fafc;
+      --border: #e2e8f0;
+      --border-focus: #38bdf8;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      
+      --present: #10b981;
+      --present-bg: #ecfdf5;
+      --late: #f59e0b;
+      --late-bg: #fffbeb;
+      --absent: #ef4444;
+      --absent-bg: #fef2f2;
+      --excused: #6b7280;
+      --excused-bg: #f3f4f6;
+
+      --whatsapp: #25d366;
+      --whatsapp-dark: #128c7e;
+      --calendar-blue: #4285f4;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 6px 16px -2px rgba(11,25,44,0.06), 0 2px 6px -1px rgba(11,25,44,0.04);
+      --shadow-lg: 0 16px 30px -4px rgba(11,25,44,0.1), 0 6px 12px -2px rgba(11,25,44,0.05);
+      --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      line-height: 1.5;
+      padding-bottom: 60px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navbar */
+    .navbar {
+      background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-800) 100%);
+      color: #fff;
+      padding: 1rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      border-bottom: 2px solid rgba(6, 182, 212, 0.3);
+    }
+
+    .navbar-inner {
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #0284c7, #06b6d4);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(6,182,212,0.35);
+      flex-shrink: 0;
+    }
+
+    .brand-logo-icon svg {
+      width: 26px;
+      height: 26px;
+      fill: none;
+      stroke: white;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .title-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .editable-title-container {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .class-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      outline: none;
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      transition: background 0.2s;
+    }
+
+    .class-title:hover, .class-title:focus {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .class-subtitle {
+      font-size: 0.82rem;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Mode Switcher Tabs */
+    .view-mode-tabs {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 4px;
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .view-tab-btn {
+      padding: 0.45rem 0.95rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      color: #94a3b8;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all 0.2s ease;
+    }
+
+    .view-tab-btn.active {
+      background: var(--surface);
+      color: var(--navy-900);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    /* WhatsApp & Calendar Special Buttons */
+    .btn-whatsapp {
+      background: #25d366;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 3px 10px rgba(37, 211, 102, 0.3);
+    }
+
+    .btn-whatsapp:hover {
+      background: #1eb857;
+      color: #ffffff;
+    }
+
+    .btn-calendar {
+      background: #4285f4;
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 3px 10px rgba(66, 133, 244, 0.3);
+    }
+
+    .btn-calendar:hover {
+      background: #3367d6;
+      color: #ffffff;
+    }
+
+    /* 4-Class Package & Fee Reminder Badges */
+    .fee-alert-banner {
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      border: 1.5px solid #f59e0b;
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      margin-top: 0.75rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .fee-badge-warning {
+      background: #fef3c7;
+      color: #b45309;
+      border: 1px solid #fcd34d;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .fee-badge-ok {
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 9999px;
+    }
+
+    /* Day of week filter chips */
+    .day-filter-chip {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--navy-800);
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .day-filter-chip:hover {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+    }
+
+    .day-filter-chip.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #ffffff;
+      border: 1px solid #dc2626;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
+    .session-counter-pill {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.82rem;
+      background: #f1f5f9;
+      color: var(--navy-900);
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .session-counter-pill.final-class {
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fca5a5;
+      animation: pulseSubtle 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseSubtle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    .admin-auth-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .admin-auth-indicator.locked {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .reschedule-notice {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: #f8fafc;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.7rem;
+      line-height: 1.4;
+    }
+
+    /* Swimmer Self-Service Portal Styles */
+    .portal-banner {
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #06b6d4 100%);
+      color: #ffffff;
+      border-radius: var(--radius-xl);
+      padding: 1.8rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .portal-swimmer-card {
+      background: #ffffff;
+      border: 2px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.4rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .portal-swimmer-card:hover {
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md);
+    }
+
+    .portal-swimmer-card.confirmed-present {
+      border-color: var(--present);
+      background: #f0fdf4;
+    }
+
+    .portal-swimmer-card.confirmed-absent {
+      border-color: var(--absent);
+      background: #fef2f2;
+    }
+
+    .self-rsvp-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+
+    @media (min-width: 640px) {
+      .self-rsvp-actions {
+        grid-template-columns: 1.5fr 1fr 1fr;
+      }
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 1.75rem auto 0;
+      padding: 0 1.25rem;
+    }
+
+    /* Dashboard Grid (Timer & Session Info) */
+    .dashboard-top-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (min-width: 900px) {
+      .dashboard-top-grid {
+        grid-template-columns: 1.3fr 1.7fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      padding: 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.2rem;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--primary);
+    }
+
+    /* Timer Widget */
+    .timer-card {
+      background: linear-gradient(145deg, #0e243d 0%, #081729 100%);
+      color: #ffffff;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .timer-card .card-title {
+      color: #f1f5f9;
+    }
+
+    .timer-card .card-title svg {
+      stroke: var(--accent);
+    }
+
+    .timer-display-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.1rem 0;
+      position: relative;
+    }
+
+    .timer-digits {
+      font-family: var(--font-mono);
+      font-size: 3.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      line-height: 1;
+      color: #38bdf8;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.45);
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.15s ease;
+    }
+
+    .timer-digits:hover {
+      transform: scale(1.02);
+    }
+
+    .timer-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: #94a3b8;
+    }
+
+    .timer-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-family: var(--font-main);
+      font-weight: 600;
+      font-size: 0.88rem;
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: var(--navy-800);
+      border-color: var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-navy {
+      background: var(--navy-800);
+      color: #ffffff;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .btn-navy:hover {
+      background: var(--navy-700);
+    }
+
+    .btn-timer {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-timer:hover {
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .btn-timer-primary {
+      background: #0284c7;
+      color: #ffffff;
+      border: 1px solid #38bdf8;
+      box-shadow: 0 0 15px rgba(2, 132, 199, 0.5);
+    }
+
+    .btn-timer-primary:hover {
+      background: #0369a1;
+    }
+
+    .btn-icon {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-sm {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+    }
+
+    /* Stats & Session Panel */
+    .session-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .stat-box {
+      background: var(--surface-subtle);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--navy-900);
+      margin-top: 0.2rem;
+    }
+
+    .stat-box.present .stat-value { color: var(--present); }
+    .stat-box.late .stat-value { color: var(--late); }
+    .stat-box.absent .stat-value { color: var(--absent); }
+
+    .session-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .input-field, .select-field {
+      font-family: var(--font-main);
+      font-size: 0.9rem;
+      padding: 0.6rem 0.85rem;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text-main);
+      outline: none;
+      transition: all 0.2s;
+    }
+
+    .input-field:focus, .select-field:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    /* Attendance Toolbar */
+    .attendance-toolbar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .search-input-wrapper svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 17px;
+      height: 17px;
+      stroke: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      padding-left: 2.3rem;
+    }
+
+    .actions-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    /* Roster Table / Card layout */
+    .roster-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      min-width: 820px;
+    }
+
+    .roster-table th {
+      background: #f8fafc;
+      padding: 0.9rem 1.2rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .roster-table td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+      font-size: 0.92rem;
+    }
+
+    .roster-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .roster-table tr:hover td {
+      background: #f9fbfe;
+    }
+
+    /* Student Column */
+    .student-profile {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .student-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: white;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      text-transform: uppercase;
+    }
+
+    .student-meta {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .student-name {
+      font-weight: 700;
+      color: var(--navy-900);
+      font-size: 0.98rem;
+    }
+
+    .student-subinfo {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* Tag badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-lane {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .badge-instructor {
+      background: #f1f5f9;
+      color: var(--navy-800);
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+    }
+
+    .badge-instructor:hover {
+      background: #e2e8f0;
+    }
+
+    /* Attendance Status Buttons Group */
+    .status-btn-group {
+      display: inline-flex;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: var(--radius-md);
+      gap: 3px;
+    }
+
+    .status-btn {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      border-radius: calc(var(--radius-md) - 3px);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .status-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.6);
+    }
+
+    .status-btn.active.present {
+      background: var(--present);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+    }
+
+    .status-btn.active.late {
+      background: var(--late);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(245, 158, 11, 0.4);
+    }
+
+    .status-btn.active.absent {
+      background: var(--absent);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
+    }
+
+    .status-btn.active.excused {
+      background: var(--excused);
+      color: #ffffff;
+    }
+
+    /* Quick notes input */
+    .note-input {
+      width: 100%;
+      min-width: 130px;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.82rem;
+      border: 1px dashed #cbd5e1;
+      border-radius: var(--radius-sm);
+      background: #fcfdfe;
+      outline: none;
+      color: var(--text-main);
+    }
+
+    .note-input:focus {
+      border-color: var(--primary);
+      border-style: solid;
+      background: #ffffff;
+    }
+
+    /* Modal Backdrop & Content */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 25, 44, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: var(--radius-xl);
+      max-width: 520px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-overlay.open .modal-box {
+      transform: translateY(0) scale(1);
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-header h3 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--navy-900);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .modal-close-btn {
+      background: transparent;
+      border: none;
+      font-size: 1.4rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-sm);
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      max-height: 75vh;
+      overflow-y: auto;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--navy-800);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-help {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Instructors Management list in modal */
+    .coach-pill-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .coach-pill-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f1f5f9;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      font-weight: 500;
+      font-size: 0.88rem;
+    }
+
+    .coach-remove-btn {
+      color: var(--absent);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 2px 6px;
+    }
+
+    .coach-remove-btn:hover {
+      text-decoration: underline;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: var(--navy-900);
+      color: #fff;
+      padding: 0.85rem 1.25rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      pointer-events: auto;
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      border-left: 4px solid var(--accent);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    .empty-state svg {
+      width: 48px;
+      height: 48px;
+      stroke: var(--text-light);
+      margin-bottom: 0.85rem;
+    }
+
+    /* Responsive Mobile Adjustments */
+    @media (max-width: 768px) {
+      .navbar {
+        padding: 0.85rem 1rem;
+      }
+      .navbar-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+      }
+      .view-mode-tabs {
+        width: 100%;
+        display: flex;
+      }
+      .view-tab-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.6rem;
+      }
+      .nav-actions {
+        width: 100%;
+        justify-content: stretch;
+        gap: 0.4rem;
+      }
+      .nav-actions .btn {
+        flex: 1;
+        padding: 0.5rem 0.4rem;
+        font-size: 0.78rem;
+        text-align: center;
+      }
+      .timer-digits {
+        font-size: clamp(2.6rem, 12vw, 3.8rem);
+      }
+      .attendance-toolbar {
+        padding: 0.85rem;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .filter-group {
+        flex-direction: column;
+        width: 100%;
+      }
+      .filter-group > div, .search-input-wrapper {
+        width: 100%;
+      }
+      .actions-group {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .actions-group .btn {
+        flex: 1;
+      }
+      /* Convert table to mobile-friendly swipeable cards */
+      .roster-table, .roster-table thead, .roster-table tbody, .roster-table tr, .roster-table td {
+        display: block;
+      }
+      .roster-table thead {
+        display: none;
+      }
+      .roster-table {
+        min-width: 100%;
+      }
+      .roster-table tr {
+        background: #ffffff;
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 1rem;
+        box-shadow: var(--shadow-sm);
+      }
+      .roster-table td {
+        padding: 0.55rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .roster-table td::before {
+        content: attr(data-label);
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.04em;
+      }
+      .roster-table td:first-child {
+        padding-top: 0;
+      }
+      .roster-table td:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+        justify-content: flex-end;
+      }
+      .status-btn-group {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+      }
+      .status-btn {
+        justify-content: center;
+        padding: 0.55rem 0.2rem;
+        font-size: 0.75rem;
+      }
+      .modal-box {
+        margin: 0.5rem;
+        max-height: 90vh;
+        border-radius: var(--radius-lg);
+      }
+      .modal-body {
+        padding: 1rem;
+      }
+      .input-field, .select-field {
+        font-size: 16px; /* Prevents auto-zoom on iOS safari */
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .navbar, .timer-card, .attendance-toolbar, .actions-col, .btn-group-cell, .toast-container {
+        display: none !important;
+      }
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="navbar">
+    <div class="navbar-inner">
+      <div class="brand">
+        <div class="brand-logo-icon">
+          <!-- Swimming Swimmer Wave SVG -->
+          <svg viewBox="0 0 24 24">
+            <path d="M2 17c1.5-1 3.5-1 5 0s3.5 1 5 0 3.5-1 5 0 3.5 1 5 0" />
+            <path d="M2 21c1.5-1 3.5-1 5 0s3.5 1 5 0 3.5-1 5 0 3.5 1 5 0" />
+            <circle cx="16" cy="5" r="2" />
+            <path d="m9 9 4 2 3-3" />
+            <path d="m6 13 4-2 3 3" />
+          </svg>
+        </div>
+        <div class="title-wrapper">
+          <div class="editable-title-container">
+            <h1 id="classTitleDisplay" class="class-title" title="Click to rename class">H2O Swimming Class</h1>
+            <button class="btn btn-navy btn-sm" id="btnEditTitleModal" title="Change Class Name (Requires Admin Login)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+          </div>
+          <span class="class-subtitle" id="subTitleDisplay">Adult Master & Beginner Attendance Tracking</span>
+        </div>
+      </div>
+
+      <!-- Mode Toggle for Coach vs Swimmer Self-Check-in -->
+      <div class="view-mode-tabs">
+        <button class="view-tab-btn" id="tabCoachMode" title="Coach/Admin Roster (Password Protected)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Coach Roster</span>
+        </button>
+        <button class="view-tab-btn active" id="tabSwimmerMode">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+          <span>Swimmer Check-in</span>
+        </button>
+      </div>
+
+      <div class="nav-actions">
+        <!-- Admin Status Indicator / Logout -->
+        <div id="adminStatusBadge" class="admin-auth-indicator locked" title="Coach mode status">
+          <span id="adminStatusDot">🔒</span>
+          <span id="adminStatusText">Student Mode</span>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btnAdminLogout" style="display: none; padding: 0.35rem 0.65rem;">
+          Coach Logout
+        </button>
+        <button class="btn btn-navy btn-sm" id="btnCoachCalendarReminder" title="Add class schedule to Coach Google Calendar">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Coach Calendar
+        </button>
+        <button class="btn btn-navy btn-sm" id="btnInstructorsModal">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Manage Coaches
+        </button>
+        <button class="btn btn-primary btn-sm" id="btnShareWhatsApp">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share Report
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+    
+    <!-- ==================== VIEW 1: COACH DASHBOARD (PROTECTED: admin / admin123) ==================== -->
+    <div id="coachViewSection" style="display: none;">
+      <!-- Top Grid: Session Info & Class Timer -->
+      <div class="dashboard-top-grid">
+
+      <!-- Class Session & Training Timer -->
+      <section class="card timer-card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Class & Drill Timer
+          </div>
+          <button class="btn btn-timer btn-sm" id="btnEditTimerModal" title="Set Timer Duration">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Set Duration
+          </button>
+        </div>
+
+        <div class="timer-display-box">
+          <div class="timer-digits" id="timerDisplay" title="Click to start/pause">45:00</div>
+          <div class="timer-meta">
+            <span id="timerModeLabel">Target: 45 Minutes Session</span>
+            <span>•</span>
+            <span id="timerStatusLabel" style="color: #38bdf8; font-weight: 600;">Ready</span>
+          </div>
+        </div>
+
+        <div class="timer-controls">
+          <button class="btn btn-timer-primary" id="btnTimerStartPause">
+            <svg id="timerPlayIcon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <span id="timerBtnText">Start Timer</span>
+          </button>
+          <button class="btn btn-timer" id="btnTimerReset">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            Reset
+          </button>
+          <button class="btn btn-timer" id="btnTimerAdd5">
+            +5 Min
+          </button>
+          <button class="btn btn-timer" id="btnTimerTestBeep" title="Test poolside sound buzzer">
+            🔔 Buzzer
+          </button>
+        </div>
+      </section>
+
+      <!-- Active Session Details & Live Stats -->
+      <section class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Today's Session Details
+          </div>
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;" id="lastSavedTime">Auto-saved</span>
+        </div>
+
+        <div class="session-controls-row">
+          <div style="flex: 1; min-width: 150px;">
+            <label class="form-label" style="font-size: 0.78rem;">Session Date</label>
+            <input type="date" id="sessionDateInput" class="input-field" style="width: 100%;">
+          </div>
+          <div style="flex: 1.2; min-width: 180px;">
+            <label class="form-label" style="font-size: 0.78rem;">Time Slot / Group</label>
+            <select id="sessionTimeSlot" class="select-field" style="width: 100%;">
+              <option value="09:00 AM - 09:45 AM" selected>09:00 AM - 09:45 AM (Standard Morning)</option>
+              <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM (Early Swim)</option>
+              <option value="08:30 AM - 09:30 AM">08:30 AM - 09:30 AM (Adult Novice)</option>
+              <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM (Technique & Drills)</option>
+              <option value="05:30 PM - 06:30 PM">05:30 PM - 06:30 PM (Evening Class)</option>
+              <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM (Adult Fitness)</option>
+              <option value="08:15 PM - 09:15 PM">08:15 PM - 09:15 PM (Masters Swim)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Live Metrics -->
+        <div class="session-info-grid">
+          <div class="stat-box">
+            <span class="stat-label">Total Swimmers</span>
+            <span class="stat-value" id="statTotal">0</span>
+          </div>
+          <div class="stat-box present">
+            <span class="stat-label">In Pool (Present)</span>
+            <span class="stat-value" id="statPresent">0</span>
+          </div>
+          <div class="stat-box late">
+            <span class="stat-label">Late Arrival</span>
+            <span class="stat-value" id="statLate">0</span>
+          </div>
+          <div class="stat-box absent">
+            <span class="stat-label">Absent</span>
+            <span class="stat-value" id="statAbsent">0</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Attendance Management Toolbar -->
+    <section class="attendance-toolbar">
+      <div class="filter-group">
+        <!-- Search -->
+        <div class="search-input-wrapper">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" class="input-field" placeholder="Search student by name or lane...">
+        </div>
+
+        <!-- Filter by Instructor -->
+        <div>
+          <select id="filterInstructorSelect" class="select-field">
+            <option value="ALL">All Instructors</option>
+            <!-- Injected dynamically -->
+          </select>
+        </div>
+
+        <!-- Filter by Status -->
+        <div>
+          <select id="filterStatusSelect" class="select-field">
+            <option value="ALL">All Statuses</option>
+            <option value="present">In Pool (Present)</option>
+            <option value="late">Late Only</option>
+            <option value="absent">Absent Only</option>
+            <option value="pending">Pending (Not Checked In)</option>
+          </select>
+        </div>
+
+        <!-- Filter by Date Schedule -->
+        <div>
+          <select id="filterDateSelect" class="select-field">
+            <option value="ALL" selected>All Days & Dates</option>
+            <option value="TODAY_SESSION">Match Selected Session Date</option>
+            <option value="Friday">Friday Classes Only</option>
+            <option value="Saturday">Saturday Classes Only</option>
+            <option value="Sunday">Sunday Classes Only</option>
+          </select>
+        </div>
+
+        <!-- Filter by Package Status -->
+        <div>
+          <select id="filterPackageSelect" class="select-field">
+            <option value="ALL">All Package Statuses</option>
+            <option value="DUE">Renewal Due (4th Class)</option>
+            <option value="ACTIVE">Classes 1 - 3</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions-group">
+        <button class="btn btn-secondary btn-sm" id="btnExportCsv" title="Export roster and attendance to CSV spreadsheet">
+          📥 Export CSV
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnResetDayAttendance" title="Reset all statuses to pending for a new session day">
+          🔄 Reset Statuses
+        </button>
+        <button class="btn btn-secondary btn-sm" id="btnMarkAllPresent" title="Mark all filtered students present">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark All Present
+        </button>
+        <button class="btn btn-primary btn-sm" id="btnOpenAddStudentModal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add Swimmer
+        </button>
+      </div>
+    </section>
+
+    <!-- Swimmers Attendance List -->
+    <section class="roster-card">
+      <div class="table-container">
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th style="width: 20%;">Swimmer</th>
+              <th style="width: 17%;">Recurring Weekly Slot</th>
+              <th style="width: 14%;">Monthly Progress (4/Mo)</th>
+              <th style="width: 15%;">Instructor & Lane</th>
+              <th style="width: 18%; text-align: center;">Attendance Status</th>
+              <th style="width: 10%;">Coach Note</th>
+              <th style="width: 6%; text-align: center;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="studentTableBody">
+            <!-- Dynamic rows will be rendered here -->
+          </tbody>
+        </table>
+      </div>
+      <div id="emptyRosterNotice" class="empty-state" style="display: none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <h4 style="font-weight: 700; color: var(--navy-800);">No Swimmers Found</h4>
+        <p style="font-size: 0.88rem; margin-top: 0.3rem;">Try clearing your search or filter, or add a new swimmer.</p>
+      </div>
+    </section>
+    </div> <!-- /#coachViewSection -->
+
+    <!-- ==================== VIEW 2: SWIMMER SELF CHECK-IN PORTAL ==================== -->
+    <div id="swimmerViewSection">
+      <!-- Welcome Banner -->
+      <div class="portal-banner">
+        <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.3rem;">🏊 Swimmer Attendance & Self Check-in</h2>
+        <p style="opacity: 0.95; font-size: 0.95rem; max-width: 820px;">
+          Welcome swimmers! Please tick your attendance below. Your class is scheduled <strong>4 times a month</strong> at your fixed weekly time.
+          If this is your <strong>4th class of the month</strong>, please settle next month's fees to secure your weekly slot. 
+          <em>To change your weekly slot, please inform your coach directly via WhatsApp so they can check lane availability.</em>
+        </p>
+        <div style="margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <div style="background: rgba(255, 255, 255, 0.2); padding: 0.4rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600;">
+            📅 Session: <span id="portalDisplayDate"></span> (<span id="portalDisplaySlot"></span>)
+          </div>
+          <div style="background: rgba(255, 255, 255, 0.2); padding: 0.4rem 0.85rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600;">
+            📌 Package: 4 Sessions / Month
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Search & Day Filter for swimmer -->
+      <div class="attendance-toolbar" style="margin-bottom: 1.5rem;">
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; width: 100%;">
+          <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem;">
+            <div class="search-input-wrapper" style="max-width: 480px; width: 100%;">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="portalSearchInput" class="input-field" placeholder="Type your name to find your card...">
+            </div>
+            <div style="font-size: 0.88rem; color: var(--text-muted);">
+              Tap your response: <strong style="color: var(--present);">✓ Coming</strong>, <strong style="color: var(--late);">⏰ Late</strong>, or <strong style="color: var(--absent);">✕ Can't Make It</strong>.
+            </div>
+          </div>
+          <!-- Quick Day of Week filter chips -->
+          <div style="display: flex; align-items: center; gap: 0.45rem; flex-wrap: wrap;">
+            <span style="font-size: 0.78rem; font-weight: 700; color: var(--navy-800); text-transform: uppercase;">Filter by Day:</span>
+            <button type="button" class="day-filter-chip active" data-day="ALL">All Days</button>
+            <button type="button" class="day-filter-chip" data-day="Friday">Friday</button>
+            <button type="button" class="day-filter-chip" data-day="Saturday">Saturday</button>
+            <button type="button" class="day-filter-chip" data-day="Sunday">Sunday</button>
+            <button type="button" class="day-filter-chip" data-day="Monday">Monday</button>
+            <button type="button" class="day-filter-chip" data-day="Tuesday">Tuesday</button>
+            <button type="button" class="day-filter-chip" data-day="Wednesday">Wednesday</button>
+            <button type="button" class="day-filter-chip" data-day="Thursday">Thursday</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid of Swimmer Self Check-in Cards -->
+      <div id="swimmerCardGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 1.25rem;">
+        <!-- Injected via JS -->
+      </div>
+    </div> <!-- /#swimmerViewSection -->
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal 0: Coach / Admin Login Modal -->
+  <div class="modal-overlay" id="coachLoginModal">
+    <div class="modal-box" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Coach & Admin Sign In
+        </h3>
+        <button class="modal-close-btn" data-close="coachLoginModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.86rem; color: var(--text-muted); margin-bottom: 1.1rem;">
+          Please enter your coach credentials to access the roster and management tools:
+        </p>
+        <div class="form-group">
+          <label class="form-label" for="loginUsername">Username</label>
+          <input type="text" id="loginUsername" class="input-field" placeholder="Enter username" style="width: 100%;" autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" class="input-field" placeholder="Enter password" style="width: 100%;" autocomplete="current-password">
+        </div>
+        <div id="loginErrorMessage" style="color: var(--absent); font-size: 0.82rem; font-weight: 600; display: none; margin-top: 0.4rem;">
+          ⚠️ Incorrect username or password. Please try again.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="coachLoginModal">Cancel</button>
+        <button class="btn btn-primary" id="btnSubmitCoachLogin">Log In as Coach</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 1: Edit Title & Subtitle -->
+  <div class="modal-overlay" id="titleModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit Swimming Class Title
+        </h3>
+        <button class="modal-close-btn" data-close="titleModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="editClassTitleInput">Business / Class Name</label>
+          <input type="text" id="editClassTitleInput" class="input-field" style="width: 100%;" placeholder="e.g. H2O Swimming Academy">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="editSubTitleInput">Program / Tagline</label>
+          <input type="text" id="editSubTitleInput" class="input-field" style="width: 100%;" placeholder="e.g. Adult Water Confidence & Stroke Correction">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="titleModal">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveTitle">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Edit Timer Duration -->
+  <div class="modal-overlay" id="timerModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Set Class Timer Duration
+        </h3>
+        <button class="modal-close-btn" data-close="timerModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Quick Presets</label>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(30)">30 Minutes</button>
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(45)">45 Minutes (Standard)</button>
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(60)">60 Minutes (Full Hour)</button>
+            <button class="btn btn-secondary btn-sm" onclick="setTimerPreset(10)">10 Min Drill</button>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+          <div class="form-group">
+            <label class="form-label" for="timerMinutesInput">Minutes</label>
+            <input type="number" id="timerMinutesInput" class="input-field" min="0" max="180" value="45" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="timerSecondsInput">Seconds</label>
+            <input type="number" id="timerSecondsInput" class="input-field" min="0" max="59" value="0" style="width: 100%;">
+          </div>
+        </div>
+        <p class="form-help">Setting new time will pause and update the poolside countdown display.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="timerModal">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveTimer">Apply Timer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Manage Instructors -->
+  <div class="modal-overlay" id="instructorsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          Swimming Instructors / Coaches
+        </h3>
+        <button class="modal-close-btn" data-close="instructorsModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label" for="newCoachName">Coach / Instructor Name</label>
+          <input type="text" id="newCoachName" class="input-field" placeholder="e.g. Coach Maya" style="width: 100%;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="newCoachPhone">Coach WhatsApp Number (with country code)</label>
+          <div style="display: flex; gap: 0.5rem;">
+            <input type="text" id="newCoachPhone" class="input-field" placeholder="e.g. +60123456789 or 0123456789" style="flex: 1;">
+            <button class="btn btn-primary" id="btnAddCoach">Add Coach</button>
+          </div>
+          <span class="form-help">Students will use this number to message their coach directly via WhatsApp.</span>
+        </div>
+
+        <div class="form-group" style="margin-top: 1.25rem;">
+          <label class="form-label">Current Active Coaches</label>
+          <div id="coachPillList" class="coach-pill-list">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-close="instructorsModal">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Add / Edit Swimmer -->
+  <div class="modal-overlay" id="studentModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="studentModalHeading">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Add Adult Swimmer
+        </h3>
+        <button class="modal-close-btn" data-close="studentModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editStudentId">
+
+        <div class="form-group">
+          <label class="form-label" for="studentFullName">Full Name *</label>
+          <input type="text" id="studentFullName" class="input-field" placeholder="e.g. Rachel Adams" style="width: 100%;" required>
+        </div>
+
+        <!-- Weekly Recurring Day and Time Slot -->
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-md); padding: 0.9rem; margin-bottom: 1rem;">
+          <div style="font-size: 0.8rem; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 0.5rem;">
+            🔁 Weekly Recurring Slot (4x Per Month)
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+            <div>
+              <label class="form-label" for="studentRecurringDay" style="font-size: 0.8rem;">Repeating Day of Week</label>
+              <select id="studentRecurringDay" class="select-field" style="width: 100%;">
+                <option value="Friday" selected>Every Friday</option>
+                <option value="Monday">Every Monday</option>
+                <option value="Tuesday">Every Tuesday</option>
+                <option value="Wednesday">Every Wednesday</option>
+                <option value="Thursday">Every Thursday</option>
+                <option value="Saturday">Every Saturday</option>
+                <option value="Sunday">Every Sunday</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="studentTimeSlot" style="font-size: 0.8rem;">Class Time Slot</label>
+              <select id="studentTimeSlot" class="select-field" style="width: 100%;">
+                <option value="09:00 AM - 09:45 AM" selected>09:00 AM - 09:45 AM (Standard)</option>
+                <option value="07:00 AM - 08:00 AM">07:00 AM - 08:00 AM</option>
+                <option value="08:30 AM - 09:30 AM">08:30 AM - 09:30 AM</option>
+                <option value="10:00 AM - 11:00 AM">10:00 AM - 11:00 AM</option>
+                <option value="05:30 PM - 06:30 PM">05:30 PM - 06:30 PM</option>
+                <option value="07:00 PM - 08:00 PM">07:00 PM - 08:00 PM</option>
+                <option value="08:15 PM - 09:15 PM">08:15 PM - 09:15 PM</option>
+                <option value="CUSTOM">Custom Time...</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-help" style="margin-top: 0.4rem; color: #166534;">
+            Students will attend this identical time every week. Only coaches can change this with availability.
+          </div>
+        </div>
+
+        <!-- Custom time text input (shown if custom is chosen) -->
+        <div class="form-group" id="customTimeGroup" style="display: none;">
+          <label class="form-label" for="studentCustomTime">Enter Custom Time Slot</label>
+          <input type="text" id="studentCustomTime" class="input-field" placeholder="e.g. 09:00 AM - 09:45 AM" style="width: 100%;">
+          <span class="form-help">Enter start and end time (e.g. 09:00 AM - 09:45 AM)</span>
+        </div>
+
+        <!-- Current Session Date & Monthly Progress -->
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.85rem;">
+          <div class="form-group">
+            <label class="form-label" for="studentDate">Session Date *</label>
+            <input type="date" id="studentDate" class="input-field" style="width: 100%;" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="studentSessionNumber">Class of the Month (1 to 4) *</label>
+            <select id="studentSessionNumber" class="select-field" style="width: 100%;">
+              <option value="1">Class 1 of 4 (1st Week)</option>
+              <option value="2">Class 2 of 4 (2nd Week)</option>
+              <option value="3">Class 3 of 4 (3rd Week)</option>
+              <option value="4">Class 4 of 4 (Final Class - Fee Due!)</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+          <div class="form-group">
+            <label class="form-label" for="studentPhone">Phone / WhatsApp</label>
+            <input type="text" id="studentPhone" class="input-field" placeholder="e.g. +6012-3456789" style="width: 100%;">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="studentLane">Lane / Group</label>
+            <input type="text" id="studentLane" class="input-field" placeholder="e.g. Lane 1 (Shallow)" style="width: 100%;">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem;">
+          <div class="form-group">
+            <label class="form-label" for="studentLevel">Adult Skill Level</label>
+            <select id="studentLevel" class="select-field" style="width: 100%;">
+              <option value="Beginner (Water Fear / Floating)">Beginner (Water Fear / Floating)</option>
+              <option value="Beginner (Freestyle & Breathing)">Beginner (Freestyle & Breathing)</option>
+              <option value="Intermediate (Breaststroke / Backstroke)">Intermediate (Breaststroke)</option>
+              <option value="Advanced / Lap Endurance">Advanced / Lap Endurance</option>
+              <option value="Private 1-on-1">Private 1-on-1</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="studentInstructorSelect">Assigned Instructor</label>
+            <select id="studentInstructorSelect" class="select-field" style="width: 100%;">
+              <!-- Injected dynamically -->
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="studentInitialNotes">Health / Coach Notes</label>
+          <input type="text" id="studentInitialNotes" class="input-field" placeholder="e.g. Uses swimming cap, recovering shoulder, goggles fitted" style="width: 100%;">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="studentModal">Cancel</button>
+        <button class="btn btn-primary" id="btnSaveStudent">Save Swimmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Quick WhatsApp / Share Preview -->
+  <div class="modal-overlay" id="shareModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Share Attendance Summary
+        </h3>
+        <button class="modal-close-btn" data-close="shareModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+          Ready to paste into WhatsApp, coach chat group, or email to management:
+        </p>
+        <textarea id="shareTextarea" class="input-field" style="width: 100%; height: 210px; font-family: var(--font-mono); font-size: 0.82rem; resize: vertical;" readonly></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="shareModal">Close</button>
+        <button class="btn btn-primary" id="btnCopyReportToClipboard">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy to Clipboard
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 6: Delete Swimmer Confirmation Modal (No native confirm/alert) -->
+  <div class="modal-overlay" id="deleteConfirmModal">
+    <div class="modal-box" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3 style="color: #ef4444;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Remove Swimmer
+        </h3>
+        <button class="modal-close-btn" data-close="deleteConfirmModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="studentToDeleteId">
+        <p style="font-size: 0.92rem; color: var(--navy-900); font-weight: 600;">
+          Are you sure you want to remove <span id="studentToDeleteName" style="color: #ef4444;"></span> from the roster?
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+          This action will permanently delete their weekly schedule and class attendance record.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="deleteConfirmModal">Cancel</button>
+        <button class="btn btn-danger" id="btnConfirmDeleteStudent">Yes, Remove Swimmer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 7: Reset All Statuses Confirmation Modal -->
+  <div class="modal-overlay" id="resetConfirmModal">
+    <div class="modal-box" style="max-width: 420px;">
+      <div class="modal-header">
+        <h3>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Reset Session Attendance
+        </h3>
+        <button class="modal-close-btn" data-close="resetConfirmModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.92rem; color: var(--navy-900); font-weight: 600;">
+          Reset attendance statuses for all swimmers to "Pending" (Unconfirmed)?
+        </p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">
+          Use this when starting a new swimming day so swimmers can check in afresh. Swimmer profiles and monthly package numbers will NOT be erased.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close="resetConfirmModal">Cancel</button>
+        <button class="btn btn-primary" id="btnConfirmResetStatuses">Reset for New Day</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    /* Default initial state */
+    const STORAGE_KEY = 'H2O_SWIM_ATTENDANCE_V4';
+
+    const getTodayDateStr = () => new Date().toISOString().split('T')[0];
+
+    // Auth State: coach needs to log in with admin / admin123
+    let isAdminLoggedIn = false;
+    let currentPortalDayFilter = 'ALL';
+
+    let appState = {
+      classTitle: "H2O Swimming Class",
+      classSubtitle: "Adult Swimming Academy • Attendance Register",
+      poolLocation: "National Aquatic Centre / Complex Swimming Pool",
+      timerDurationMinutes: 45,
+      timerDurationSeconds: 0,
+      monthlyPackageClasses: 4,
+      instructors: [
+        { name: "Coach Maya (Lead)", phone: "+60129842110" },
+        { name: "Coach Sarah", phone: "+60193310928" },
+        { name: "Coach David", phone: "+60178821940" },
+        { name: "Coach Alex", phone: "+60187712390" }
+      ],
+      students: [
+        {
+          id: 's1',
+          name: 'Jennifer Wong',
+          phone: '+6012-9842110',
+          lane: 'Lane 1 (Shallow)',
+          level: 'Beginner (Water Fear / Floating)',
+          instructor: 'Coach Maya (Lead)',
+          recurringDay: 'Friday',
+          sessionTime: '09:00 AM - 09:45 AM',
+          sessionDate: getTodayDateStr(),
+          sessionNumber: 4, // 4th class of month -> Fee reminder trigger!
+          status: 'present',
+          notes: 'Mastered floating today'
+        },
+        {
+          id: 's2',
+          name: 'Daniel Lim',
+          phone: '+6019-3310928',
+          lane: 'Lane 2',
+          level: 'Beginner (Freestyle & Breathing)',
+          instructor: 'Coach Sarah',
+          recurringDay: 'Friday',
+          sessionTime: '09:00 AM - 09:45 AM',
+          sessionDate: getTodayDateStr(),
+          sessionNumber: 2,
+          status: 'present',
+          notes: 'Bilateral breathing drill'
+        },
+        {
+          id: 's3',
+          name: 'Ahmad Faiz',
+          phone: '+6017-8821940',
+          lane: 'Lane 2',
+          level: 'Beginner (Freestyle & Breathing)',
+          instructor: 'Coach Sarah',
+          recurringDay: 'Friday',
+          sessionTime: '09:00 AM - 09:45 AM',
+          sessionDate: getTodayDateStr(),
+          sessionNumber: 4, // 4th class of month -> Fee reminder trigger!
+          status: 'late',
+          notes: 'Arrived 15 mins late'
+        },
+        {
+          id: 's4',
+          name: 'Siti Nurhaliza',
+          phone: '+6013-2287461',
+          lane: 'Lane 3',
+          level: 'Intermediate (Breaststroke)',
+          instructor: 'Coach David',
+          recurringDay: 'Saturday',
+          sessionTime: '10:00 AM - 11:00 AM',
+          sessionDate: getTodayDateStr(),
+          sessionNumber: 3,
+          status: 'present',
+          notes: 'Leg whip kick focus'
+        },
+        {
+          id: 's5',
+          name: 'Marcus Roberts',
+          phone: '+6018-7712390',
+          lane: 'Lane 4 (Deep)',
+          level: 'Advanced / Lap Endurance',
+          instructor: 'Coach Alex',
+          recurringDay: 'Friday',
+          sessionTime: '09:00 AM - 09:45 AM',
+          sessionDate: getTodayDateStr(),
+          sessionNumber: 4, // 4th class -> Fee reminder
+          status: 'absent',
+          notes: 'Informed via WhatsApp (fever)'
+        },
+        {
+          id: 's6',
+          name: 'Priya Raman',
+          phone: '+6011-4560123',
+          lane: 'Lane 1 (Shallow)',
+          level: 'Beginner (Water Fear / Floating)',
+          instructor: 'Coach Maya (Lead)',
+          recurringDay: 'Friday',
+          sessionTime: '09:00 AM - 09:45 AM',
+          sessionDate: getTodayDateStr(),
+          sessionNumber: 1,
+          status: 'present',
+          notes: 'Very relaxed in deep water'
+        }
+      ]
+    };
+
+    /* Timer state */
+    let timerTotalSeconds = 45 * 60;
+    let timerRemainingSeconds = 45 * 60;
+    let timerInterval = null;
+    let isTimerRunning = false;
+
+    /* Audio Context for Poolside Beep */
+    let audioCtx = null;
+    function playBeep(freq = 780, type = 'sine', duration = 0.25) {
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        console.warn('Audio not allowed or supported', e);
+      }
+    }
+
+    function playTripleAlert() {
+      playBeep(880, 'sine', 0.2);
+      setTimeout(() => playBeep(880, 'sine', 0.2), 220);
+      setTimeout(() => playBeep(1100, 'square', 0.4), 440);
+    }
+
+    /* Initialize and Load from LocalStorage */
+    function loadStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('H2O_SWIM_ATTENDANCE_V3');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.instructors && parsed.instructors.length > 0 && typeof parsed.instructors[0] === 'string') {
+            parsed.instructors = parsed.instructors.map((c, i) => ({
+              name: c,
+              phone: appState.instructors[i]?.phone || '+60123456789'
+            }));
+          }
+          if (parsed.students) {
+            parsed.students.forEach(s => {
+              if (!s.sessionDate) s.sessionDate = getTodayDateStr();
+              if (!s.sessionTime) s.sessionTime = '09:00 AM - 09:45 AM';
+              if (!s.recurringDay) s.recurringDay = 'Friday';
+              if (!s.sessionNumber) s.sessionNumber = 1;
+            });
+          }
+          appState = Object.assign(appState, parsed);
+        } catch (e) {
+          console.error('Failed to parse stored state', e);
+        }
+      }
+      timerTotalSeconds = (appState.timerDurationMinutes * 60) + (appState.timerDurationSeconds || 0);
+      timerRemainingSeconds = timerTotalSeconds;
+
+      // Check if session was authenticated previously in this browser session
+      if (sessionStorage.getItem('H2O_ADMIN_AUTH') === 'true') {
+        isAdminLoggedIn = true;
+      }
+    }
+
+    function saveStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      const timeElem = document.getElementById('lastSavedTime');
+      if (timeElem) {
+        const now = new Date();
+        timeElem.textContent = `Saved ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+      }
+    }
+
+    /* Helper: Clean phone number for WhatsApp link */
+    function formatPhoneForWhatsApp(phone) {
+      if (!phone) return '';
+      let clean = phone.replace(/[^0-9]/g, '');
+      if (clean.startsWith('00')) {
+        clean = clean.substring(2);
+      }
+      // If starts with Malaysian local 01..., convert to 601...
+      if (clean.startsWith('01')) {
+        clean = '6' + clean;
+      }
+      return clean;
+    }
+
+    /* Helper: Construct Google Calendar URL */
+    function generateGoogleCalendarUrl(title, dateStr, timeSlotStr, details, locationStr) {
+      // timeSlotStr example: "07:00 PM - 08:00 PM"
+      let startHours = 19, startMinutes = 0;
+      let endHours = 20, endMinutes = 0;
+
+      try {
+        const parts = timeSlotStr.split('-').map(p => p.trim());
+        if (parts.length >= 2) {
+          const parseTime = (timeStr) => {
+            const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+            if (match) {
+              let h = parseInt(match[1], 10);
+              const m = parseInt(match[2], 10);
+              const period = match[3].toUpperCase();
+              if (period === 'PM' && h < 12) h += 12;
+              if (period === 'AM' && h === 12) h = 0;
+              return { h, m };
+            }
+            return { h: 19, m: 0 };
+          };
+          const startObj = parseTime(parts[0]);
+          const endObj = parseTime(parts[1]);
+          startHours = startObj.h;
+          startMinutes = startObj.m;
+          endHours = endObj.h;
+          endMinutes = endObj.m;
+        }
+      } catch (err) {
+        console.warn('Error parsing timeslot', err);
+      }
+
+      // Convert dateStr (YYYY-MM-DD) into YYYYMMDD
+      const dateClean = (dateStr || new Date().toISOString().split('T')[0]).replace(/-/g, '');
+      const pad = (n) => String(n).padStart(2, '0');
+
+      const startISO = `${dateClean}T${pad(startHours)}${pad(startMinutes)}00`;
+      const endISO = `${dateClean}T${pad(endHours)}${pad(endMinutes)}00`;
+
+      const gcalUrl = new URL('https://calendar.google.com/calendar/render');
+      gcalUrl.searchParams.set('action', 'TEMPLATE');
+      gcalUrl.searchParams.set('text', title);
+      gcalUrl.searchParams.set('dates', `${startISO}/${endISO}`);
+      gcalUrl.searchParams.set('details', details);
+      gcalUrl.searchParams.set('location', locationStr || 'Swimming Complex');
+
+      return gcalUrl.toString();
+    }
+
+    /* Helper to find Coach Object by Coach Name */
+    function getCoachData(coachName) {
+      return appState.instructors.find(c => c.name === coachName) || {
+        name: coachName,
+        phone: '+60123456789'
+      };
+    }
+
+    /* Toast notification helper */
+    function showToast(message, icon = '✓') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        toast.style.transition = 'all 0.3s ease';
+        setTimeout(() => toast.remove(), 300);
+      }, 3200);
+    }
+
+    /* UI Rendering */
+    function renderTitles() {
+      document.getElementById('classTitleDisplay').textContent = appState.classTitle;
+      document.getElementById('subTitleDisplay').textContent = appState.classSubtitle;
+      document.title = `${appState.classTitle} - Attendance`;
+
+      // Update banner date labels
+      const dateVal = document.getElementById('sessionDateInput') ? document.getElementById('sessionDateInput').value : '';
+      const slotVal = document.getElementById('sessionTimeSlot') ? document.getElementById('sessionTimeSlot').value : '';
+      const displayDateElem = document.getElementById('portalDisplayDate');
+      const displaySlotElem = document.getElementById('portalDisplaySlot');
+      if (displayDateElem) displayDateElem.textContent = dateVal || 'Today';
+      if (displaySlotElem) displaySlotElem.textContent = slotVal || 'Session';
+    }
+
+    function renderInstructorsDropdowns() {
+      // 1. Filter dropdown in toolbar
+      const filterSelect = document.getElementById('filterInstructorSelect');
+      const currentFilter = filterSelect.value;
+      filterSelect.innerHTML = '<option value="ALL">All Instructors</option>';
+      appState.instructors.forEach(coach => {
+        const opt = document.createElement('option');
+        opt.value = coach.name;
+        opt.textContent = `${coach.name} (${coach.phone || 'No phone'})`;
+        filterSelect.appendChild(opt);
+      });
+      if (appState.instructors.some(c => c.name === currentFilter)) {
+        filterSelect.value = currentFilter;
+      }
+
+      // 2. Add / Edit Swimmer instructor dropdown
+      const studentCoachSelect = document.getElementById('studentInstructorSelect');
+      studentCoachSelect.innerHTML = '';
+      appState.instructors.forEach(coach => {
+        const opt = document.createElement('option');
+        opt.value = coach.name;
+        opt.textContent = coach.name;
+        studentCoachSelect.appendChild(opt);
+      });
+
+      // 3. Modal Instructor List
+      const coachPillList = document.getElementById('coachPillList');
+      coachPillList.innerHTML = '';
+      appState.instructors.forEach((coach, index) => {
+        const item = document.createElement('div');
+        item.className = 'coach-pill-item';
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 700; color: var(--navy-900);">🏊 ${coach.name}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">📱 ${coach.phone || 'Not provided'}</div>
+          </div>
+          <button class="coach-remove-btn" onclick="removeCoach(${index})">Remove</button>
+        `;
+        coachPillList.appendChild(item);
+      });
+    }
+
+    function renderRoster() {
+      const tbody = document.getElementById('studentTableBody');
+      const emptyNotice = document.getElementById('emptyRosterNotice');
+      tbody.innerHTML = '';
+
+      const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+      const coachFilter = document.getElementById('filterInstructorSelect').value;
+      const statusFilter = document.getElementById('filterStatusSelect').value;
+      const dateFilter = document.getElementById('filterDateSelect')?.value || 'ALL';
+      const packageFilter = document.getElementById('filterPackageSelect')?.value || 'ALL';
+      const selectedSessionDate = document.getElementById('sessionDateInput')?.value || getTodayDateStr();
+
+      let filtered = appState.students.filter(student => {
+        const sDate = student.sessionDate || getTodayDateStr();
+        const sTime = student.sessionTime || '';
+        const sDay = student.recurringDay || 'Friday';
+        const matchSearch = student.name.toLowerCase().includes(searchVal) || 
+                            student.lane.toLowerCase().includes(searchVal) ||
+                            student.level.toLowerCase().includes(searchVal) ||
+                            sDay.toLowerCase().includes(searchVal) ||
+                            sTime.toLowerCase().includes(searchVal);
+        const matchCoach = (coachFilter === 'ALL') || (student.instructor === coachFilter);
+        const matchStatus = (statusFilter === 'ALL') || 
+                            (statusFilter === 'pending' && (!student.status || student.status === 'pending')) ||
+                            (student.status === statusFilter);
+        
+        let matchDate = true;
+        if (dateFilter === 'TODAY_SESSION') {
+          matchDate = (sDate === selectedSessionDate);
+        } else if (dateFilter !== 'ALL') {
+          matchDate = (sDay.toLowerCase() === dateFilter.toLowerCase());
+        }
+
+        const matchPackage = (packageFilter === 'ALL') ||
+                             (packageFilter === 'DUE' && student.sessionNumber >= 4) ||
+                             (packageFilter === 'ACTIVE' && student.sessionNumber < 4);
+
+        return matchSearch && matchCoach && matchStatus && matchDate && matchPackage;
+      });
+
+      if (filtered.length === 0) {
+        emptyNotice.style.display = 'block';
+      } else {
+        emptyNotice.style.display = 'none';
+      }
+
+      filtered.forEach(student => {
+        const tr = document.createElement('tr');
+        const sDate = student.sessionDate || getTodayDateStr();
+        const sTime = student.sessionTime || '09:00 AM - 09:45 AM';
+        const sDay = student.recurringDay || 'Friday';
+        const sNumber = parseInt(student.sessionNumber, 10) || 1;
+        const isFinalClass = sNumber >= 4;
+
+        // Initials for avatar
+        const initials = student.name
+          .split(' ')
+          .map(n => n[0])
+          .slice(0, 2)
+          .join('');
+
+        const isPresent = student.status === 'present';
+        const isLate = student.status === 'late';
+        const isAbsent = student.status === 'absent';
+
+        const coachData = getCoachData(student.instructor);
+        const coachCleanPhone = formatPhoneForWhatsApp(coachData.phone);
+        const studentCleanPhone = formatPhoneForWhatsApp(student.phone);
+
+        tr.innerHTML = `
+          <td data-label="Swimmer">
+            <div class="student-profile">
+              <div class="student-avatar">${initials}</div>
+              <div class="student-meta">
+                <span class="student-name">${student.name}</span>
+                <span class="student-subinfo">
+                  ${student.phone ? `<span>📞 ${student.phone}</span>` : '<span>Adult Swimmer</span>'}
+                </span>
+                <span style="font-size: 0.73rem; color: var(--text-muted);">${student.level}</span>
+              </div>
+            </div>
+          </td>
+          <td data-label="Recurring Weekly Slot">
+            <div style="font-weight: 700; color: var(--navy-900); font-size: 0.88rem;">🔁 Every ${sDay}</div>
+            <div style="font-size: 0.8rem; color: var(--primary); font-weight: 600; margin-top: 2px;">⏰ ${sTime}</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">Next: ${sDate}</div>
+          </td>
+          <td data-label="Monthly Progress">
+            <div style="display: flex; flex-direction: column; gap: 0.3rem;">
+              <span class="session-counter-pill ${isFinalClass ? 'final-class' : ''}">
+                ${isFinalClass ? '⚠️ Class 4 of 4' : `Class ${sNumber} of 4`}
+              </span>
+              ${isFinalClass ? `
+                <span class="fee-badge-warning">💳 Fee Renewal Due!</span>
+                <div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 2px;">
+                  <button class="btn btn-sm btn-secondary" onclick="resetStudentMonthlyPackage('${student.id}')" title="Student paid next month? Reset to Class 1/4" style="font-size: 0.72rem; padding: 0.2rem 0.4rem;">
+                    ↺ Paid: Reset 1/4
+                  </button>
+                  <button class="btn btn-sm btn-secondary" onclick="stepStudentSession('${student.id}', -1)" title="Adjust back to Class 3 if entered by mistake" style="font-size: 0.72rem; padding: 0.2rem 0.4rem;">
+                    -1 Class
+                  </button>
+                </div>
+              ` : `
+                <span class="fee-badge-ok">✓ Active Package</span>
+                <div style="display: flex; gap: 0.25rem; flex-wrap: wrap; margin-top: 2px;">
+                  <button class="btn btn-sm btn-secondary" onclick="advanceStudentSession('${student.id}')" title="Move to next class in month" style="font-size: 0.72rem; padding: 0.2rem 0.4rem;">
+                    + Next Class (${sNumber + 1}/4)
+                  </button>
+                  ${sNumber > 1 ? `
+                    <button class="btn btn-sm btn-secondary" onclick="stepStudentSession('${student.id}', -1)" title="Step back one class" style="font-size: 0.72rem; padding: 0.2rem 0.4rem;">
+                      -1
+                    </button>
+                  ` : ''}
+                </div>
+              `}
+            </div>
+          </td>
+          <td data-label="Instructor & Lane">
+            <select class="select-field" style="padding: 0.35rem 0.6rem; font-size: 0.82rem; width: 100%; max-width: 170px;" onchange="updateStudentInstructor('${student.id}', this.value)">
+              ${appState.instructors.map(coach => `
+                <option value="${coach.name}" ${student.instructor === coach.name ? 'selected' : ''}>${coach.name}</option>
+              `).join('')}
+            </select>
+            <div style="margin-top: 4px; display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap;">
+              <span class="badge badge-lane">${student.lane || 'Lane 1'}</span>
+            </div>
+          </td>
+          <td data-label="Attendance Status" style="text-align: center;">
+            <div class="status-btn-group">
+              <button type="button" class="status-btn ${isPresent ? 'active present' : ''}" onclick="toggleAttendanceStatus('${student.id}', 'present')" title="Click to mark Present (click again to uncheck)">
+                ✓ In Pool
+              </button>
+              <button type="button" class="status-btn ${isLate ? 'active late' : ''}" onclick="toggleAttendanceStatus('${student.id}', 'late')" title="Click to mark Late">
+                ⏰ Late
+              </button>
+              <button type="button" class="status-btn ${isAbsent ? 'active absent' : ''}" onclick="toggleAttendanceStatus('${student.id}', 'absent')" title="Click to mark Absent">
+                ✕ Absent
+              </button>
+            </div>
+          </td>
+          <td data-label="Coach Note">
+            <input type="text" class="note-input" value="${student.notes || ''}" placeholder="Technique note" onchange="updateStudentNote('${student.id}', this.value)">
+          </td>
+          <td data-label="Actions" style="text-align: center;">
+            <div style="display: flex; gap: 0.35rem; justify-content: flex-end;">
+              ${studentCleanPhone ? `
+                <a href="https://wa.me/${studentCleanPhone}?text=${encodeURIComponent(isFinalClass ? 
+                  `Hi ${student.name}, this is ${coachData.name} from ${appState.classTitle}. You have completed Class 4 of 4 for this month! 🏊 Please settle your renewal fee to continue securing your slot for next month.` :
+                  `Hi ${student.name}, this is ${coachData.name} regarding your weekly swimming session on ${sDay} (${sTime}).`)}" 
+                   target="_blank" class="btn btn-sm btn-whatsapp" title="WhatsApp student directly" style="padding: 0.35rem 0.55rem; border-radius: var(--radius-sm); text-decoration: none;">
+                   💬
+                </a>
+              ` : ''}
+              <button class="btn btn-secondary btn-sm" onclick="openEditStudentModal('${student.id}')" title="Edit swimmer info & schedule" style="padding: 0.35rem 0.55rem;">
+                ✏️
+              </button>
+              <button class="btn btn-secondary btn-sm" onclick="promptDeleteStudent('${student.id}')" title="Delete swimmer from roster" style="padding: 0.35rem 0.55rem; color: #ef4444;">
+                🗑️
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateStats();
+      renderSwimmerSelfCheckinPortal();
+    }
+
+    /* Render the Swimmer Self Check-in Portal Cards */
+    function renderSwimmerSelfCheckinPortal() {
+      const grid = document.getElementById('swimmerCardGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const query = (document.getElementById('portalSearchInput')?.value || '').trim().toLowerCase();
+
+      const filtered = appState.students.filter(s => {
+        const sDate = s.sessionDate || '';
+        const sTime = s.sessionTime || '';
+        const sDay = s.recurringDay || 'Friday';
+
+        const matchQuery = s.name.toLowerCase().includes(query) || 
+                           s.lane.toLowerCase().includes(query) ||
+                           sDay.toLowerCase().includes(query) ||
+                           sDate.includes(query) ||
+                           sTime.toLowerCase().includes(query);
+
+        const matchDayFilter = (currentPortalDayFilter === 'ALL') || 
+                               (sDay.toLowerCase() === currentPortalDayFilter.toLowerCase());
+
+        return matchQuery && matchDayFilter;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: #fff; border-radius: var(--radius-lg); border: 1px dashed var(--border);">
+            <p style="color: var(--text-muted); font-size: 1rem;">No swimmer found for the selected filter.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(student => {
+        const coach = getCoachData(student.instructor);
+        const cleanCoachPhone = formatPhoneForWhatsApp(coach.phone);
+        const isPresent = student.status === 'present';
+        const isLate = student.status === 'late';
+        const isAbsent = student.status === 'absent';
+        const studentDate = student.sessionDate || getTodayDateStr();
+        const studentSlot = student.sessionTime || '09:00 AM - 09:45 AM';
+        const recurringDay = student.recurringDay || 'Friday';
+        const sessionNum = parseInt(student.sessionNumber, 10) || 1;
+        const isFinalClass = sessionNum >= 4;
+
+        // WhatsApp message for swimmer to message coach
+        const waGeneralMsg = encodeURIComponent(
+          `Hi Coach ${coach.name}! I am ${student.name} from your ${appState.classTitle}.\nMy weekly slot is Every ${recurringDay} at ${studentSlot}.\n\nI have a question regarding class:`
+        );
+        const waGeneralLink = `https://wa.me/${cleanCoachPhone}?text=${waGeneralMsg}`;
+
+        // WhatsApp message specifically to request rescheduling (Only coach can change)
+        const waRescheduleMsg = encodeURIComponent(
+          `Hi Coach ${coach.name}, I am ${student.name}. My current weekly slot is Every ${recurringDay} (${studentSlot}). I would like to request to reschedule my class. Could you please check lane and coach availability for other slots? Thank you!`
+        );
+        const waRescheduleLink = `https://wa.me/${cleanCoachPhone}?text=${waRescheduleMsg}`;
+
+        // WhatsApp message for payment submission on 4th class
+        const waFeeMsg = encodeURIComponent(
+          `Hi Coach ${coach.name}, I am ${student.name}. Today is my 4th class of the month for ${appState.classTitle} (Every ${recurringDay}, ${studentSlot}). I would like to make payment and submit my fee slip to continue for next month! 🏊`
+        );
+        const waFeeLink = `https://wa.me/${cleanCoachPhone}?text=${waFeeMsg}`;
+
+        // Google Calendar direct link
+        const calTitle = `🏊 ${appState.classTitle} with ${coach.name}`;
+        const calDetails = `Swimming Class Session (Every ${recurringDay})\nSwimmer: ${student.name}\nTime: ${studentSlot}\nLane: ${student.lane}\nClass ${sessionNum} of 4 this month\nCoach: ${coach.name} (${coach.phone})\nNote: If 4th class, remember to renew monthly fee!`;
+        const calUrl = generateGoogleCalendarUrl(calTitle, studentDate, studentSlot, calDetails, appState.poolLocation);
+
+        let statusClass = '';
+        let statusBadge = '<span class="badge" style="background:#f1f5f9; color:var(--text-muted);">⚪ Unconfirmed</span>';
+        if (isPresent) {
+          statusClass = 'confirmed-present';
+          statusBadge = '<span class="badge" style="background:var(--present-bg); color:var(--present); font-weight:700;">✅ Confirmed: Coming</span>';
+        } else if (isLate) {
+          statusBadge = '<span class="badge" style="background:var(--late-bg); color:var(--late); font-weight:700;">⏰ Running Late</span>';
+        } else if (isAbsent) {
+          statusClass = 'confirmed-absent';
+          statusBadge = '<span class="badge" style="background:var(--absent-bg); color:var(--absent); font-weight:700;">❌ Not Coming (Absent)</span>';
+        }
+
+        const card = document.createElement('div');
+        card.className = `portal-swimmer-card ${statusClass}`;
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem;">
+            <div>
+              <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--navy-900);">${student.name}</h3>
+              <div style="display: flex; gap: 0.4rem; align-items: center; margin-top: 0.2rem; flex-wrap: wrap;">
+                <span class="badge badge-lane">${student.lane}</span>
+                <span style="font-size: 0.78rem; color: var(--text-muted);">${student.level}</span>
+              </div>
+            </div>
+            <div>${statusBadge}</div>
+          </div>
+
+          <!-- Weekly Fixed Schedule Box -->
+          <div style="background: #f0fdf4; border: 1.5px solid #86efac; border-radius: var(--radius-sm); padding: 0.75rem 0.9rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; font-weight: 700; color: #166534;">🔁 Fixed Weekly Schedule</div>
+                <div style="font-weight: 800; font-size: 1rem; color: var(--navy-900); margin-top: 2px;">
+                  Every ${recurringDay} &bull; ${studentSlot}
+                </div>
+              </div>
+              <div>
+                <span class="session-counter-pill ${isFinalClass ? 'final-class' : ''}">
+                  Class ${sessionNum} of 4
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4th Class Fee Reminder Banner (Active when sessionNum >= 4) -->
+          ${isFinalClass ? `
+            <div class="fee-alert-banner">
+              <span style="font-size: 1.4rem;">⚠️</span>
+              <div>
+                <div style="font-weight: 800; font-size: 0.92rem; color: #92400e;">4th Class of the Month - Fee Renewal Due!</div>
+                <div style="font-size: 0.8rem; color: #78350f; margin-top: 2px; line-height: 1.35;">
+                  You have reached your final class for this monthly cycle. Please settle your fees to retain your weekly <strong>${recurringDay} ${studentSlot}</strong> slot for next month!
+                </div>
+                <a href="${waFeeLink}" target="_blank" class="btn btn-sm btn-whatsapp" style="margin-top: 0.5rem; text-decoration: none; display: inline-flex; font-size: 0.78rem;">
+                  💳 Send Fee Payment Slip to Coach
+                </a>
+              </div>
+            </div>
+          ` : `
+            <div style="font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; padding: 0.2rem 0.4rem;">
+              <span>ℹ️</span> <span>Monthly Package: ${sessionNum}/4 classes completed.</span>
+            </div>
+          `}
+
+          <!-- Coach Details Box -->
+          <div style="background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0.65rem 0.85rem; font-size: 0.85rem;">
+            <div style="font-weight: 600; color: var(--navy-800);">Assigned Instructor: ${coach.name}</div>
+            <div style="font-size: 0.78rem; color: var(--text-muted);">WhatsApp: ${coach.phone || 'Coach phone not registered'}</div>
+          </div>
+
+          <!-- Self Check-in Action Buttons -->
+          <div>
+            <label style="display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 0.4rem;">
+              Are you coming this week?
+            </label>
+            <div class="self-rsvp-actions">
+              <button type="button" class="btn btn-sm ${isPresent ? 'btn-primary' : 'btn-secondary'}" onclick="handleSwimmerSelfCheckin('${student.id}', 'present')" style="padding: 0.6rem 0.5rem;">
+                ✓ I'm Coming!
+              </button>
+              <button type="button" class="btn btn-sm ${isLate ? 'btn-primary' : 'btn-secondary'}" onclick="handleSwimmerSelfCheckin('${student.id}', 'late')" style="padding: 0.6rem 0.5rem; ${isLate ? 'background: var(--late);' : ''}">
+                ⏰ Late
+              </button>
+              <button type="button" class="btn btn-sm ${isAbsent ? 'btn-primary' : 'btn-secondary'}" onclick="handleSwimmerSelfCheckin('${student.id}', 'absent')" style="padding: 0.6rem 0.5rem; ${isAbsent ? 'background: var(--absent);' : ''}">
+                ✕ Can't Make It
+              </button>
+            </div>
+          </div>
+
+          <!-- Reschedule Restriction Notice & Swimmer Actions -->
+          <div class="reschedule-notice">
+            <strong>Need to reschedule?</strong> Your slot repeats every ${recurringDay}. Only your instructor can change your time slot based on pool availability.
+          </div>
+
+          <div style="border-top: 1px solid var(--border); padding-top: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Request Reschedule directly with Coach -->
+            <a href="${waRescheduleLink}" target="_blank" class="btn btn-secondary btn-sm" style="width: 100%; text-decoration: none; justify-content: center; font-size: 0.82rem;">
+              💬 Request Slot Reschedule with Coach
+            </a>
+
+            <!-- Google Calendar Reminder -->
+            <a href="${calUrl}" target="_blank" class="btn btn-calendar btn-sm" style="width: 100%; text-decoration: none; justify-content: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Add to Google Calendar (Every ${recurringDay})
+            </a>
+
+            <!-- WhatsApp Coach Directly -->
+            <a href="${waGeneralLink}" target="_blank" class="btn btn-whatsapp btn-sm" style="width: 100%; text-decoration: none; justify-content: center;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm5.79 14.18c-.24.68-1.39 1.3-1.92 1.38-.5.08-1.15.11-3.69-.94-3.25-1.34-5.34-4.66-5.5-4.88-.16-.22-1.31-1.74-1.31-3.32 0-1.58.83-2.35 1.12-2.67.3-.32.65-.4 0.87-.4.22 0 .43.01.62.01.2 0 .47-.08.73.55.27.65.92 2.25 1 2.41.08.16.14.35.03.57-.11.22-.16.35-.32.54-.16.19-.34.42-.49.56-.16.16-.33.33-.14.65.19.32.84 1.38 1.8 2.24 1.24 1.1 2.29 1.44 2.62 1.6.33.16.52.14.71-.08.19-.22.81-.95 1.03-1.27.22-.32.43-.27.73-.16.3.11 1.9.9 2.23 1.06.33.16.54.24.62.38.08.14.08.81-.16 1.49z"/></svg>
+              WhatsApp Coach ${coach.name.split(' ')[0]}
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function updateStats() {
+      const total = appState.students.length;
+      const present = appState.students.filter(s => s.status === 'present').length;
+      const late = appState.students.filter(s => s.status === 'late').length;
+      const absent = appState.students.filter(s => s.status === 'absent').length;
+
+      document.getElementById('statTotal').textContent = total;
+      document.getElementById('statPresent').textContent = present;
+      document.getElementById('statLate').textContent = late;
+      document.getElementById('statAbsent').textContent = absent;
+    }
+
+    /* Monthly Package Increment & Step */
+    window.advanceStudentSession = function(studentId) {
+      if (!requireAdminAuth("advance class session")) return;
+      const student = appState.students.find(s => s.id === studentId);
+      if (student) {
+        let current = parseInt(student.sessionNumber, 10) || 1;
+        if (current < 4) {
+          student.sessionNumber = current + 1;
+        } else {
+          student.sessionNumber = 4;
+        }
+        saveStorage();
+        renderRoster();
+        showToast(`${student.name} is now on Class ${student.sessionNumber}/4`);
+      }
+    };
+
+    window.stepStudentSession = function(studentId, delta) {
+      if (!requireAdminAuth("adjust class session")) return;
+      const student = appState.students.find(s => s.id === studentId);
+      if (student) {
+        let current = parseInt(student.sessionNumber, 10) || 1;
+        let nextVal = Math.max(1, Math.min(4, current + delta));
+        student.sessionNumber = nextVal;
+        saveStorage();
+        renderRoster();
+        showToast(`${student.name} adjusted to Class ${student.sessionNumber}/4`);
+      }
+    };
+
+    window.resetStudentMonthlyPackage = function(studentId) {
+      if (!requireAdminAuth("reset monthly fee & session")) return;
+      const student = appState.students.find(s => s.id === studentId);
+      if (student) {
+        student.sessionNumber = 1;
+        student.status = 'present';
+        saveStorage();
+        renderRoster();
+        showToast(`Fee confirmed! Reset ${student.name} to Class 1/4 for new month.`);
+      }
+    };
+
+    /* Attendance Updates */
+    window.toggleAttendanceStatus = function(studentId, newStatus) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (student) {
+        // Toggle to pending if already clicked
+        if (student.status === newStatus) {
+          student.status = 'pending';
+          showToast(`${student.name} attendance set to Pending (Unchecked)`);
+        } else {
+          student.status = newStatus;
+          playBeep(520, 'sine', 0.08);
+        }
+        saveStorage();
+        renderRoster();
+      }
+    };
+
+    window.handleSwimmerSelfCheckin = function(studentId, statusChoice) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (!student) return;
+
+      if (student.status === statusChoice) {
+        student.status = 'pending';
+        showToast(`Check-in unconfirmed. You can tap again when ready.`, '⚪');
+      } else {
+        student.status = statusChoice;
+        playBeep(580, 'sine', 0.12);
+        if (statusChoice === 'present') {
+          showToast(`Awesome, ${student.name}! Marked coming for class. See you in the pool! 🏊`, '✅');
+        } else if (statusChoice === 'late') {
+          showToast(`Got it, ${student.name}. Coach notified that you will arrive late. ⏰`, '⏰');
+        } else if (statusChoice === 'absent') {
+          showToast(`Recorded, ${student.name}. Coach notified that you cannot make it.`, 'ℹ️');
+        }
+      }
+      saveStorage();
+      renderRoster();
+    };
+
+    window.updateStudentInstructor = function(studentId, newInstructor) {
+      if (!requireAdminAuth("change instructor")) return;
+      const student = appState.students.find(s => s.id === studentId);
+      if (student) {
+        student.instructor = newInstructor;
+        saveStorage();
+        showToast(`Assigned to ${newInstructor}`);
+      }
+    };
+
+    window.updateStudentNote = function(studentId, noteText) {
+      const student = appState.students.find(s => s.id === studentId);
+      if (student) {
+        student.notes = noteText;
+        saveStorage();
+      }
+    };
+
+    /* Delete Student Handlers */
+    window.promptDeleteStudent = function(studentId) {
+      if (!requireAdminAuth("delete swimmer")) return;
+      const s = appState.students.find(x => x.id === studentId);
+      if (!s) return;
+      document.getElementById('studentToDeleteId').value = s.id;
+      document.getElementById('studentToDeleteName').textContent = s.name;
+      openModal('deleteConfirmModal');
+    };
+
+    document.getElementById('btnConfirmDeleteStudent').addEventListener('click', () => {
+      const id = document.getElementById('studentToDeleteId').value;
+      const idx = appState.students.findIndex(s => s.id === id);
+      if (idx !== -1) {
+        const removedName = appState.students[idx].name;
+        appState.students.splice(idx, 1);
+        saveStorage();
+        renderRoster();
+        closeModal('deleteConfirmModal');
+        showToast(`Removed ${removedName} from class roster.`, '🗑️');
+      }
+    });
+
+    /* Reset All Attendance Statuses Handlers */
+    document.getElementById('btnResetDayAttendance').addEventListener('click', () => {
+      if (!requireAdminAuth("reset attendance statuses")) return;
+      openModal('resetConfirmModal');
+    });
+
+    document.getElementById('btnConfirmResetStatuses').addEventListener('click', () => {
+      appState.students.forEach(s => {
+        s.status = 'pending';
+      });
+      saveStorage();
+      renderRoster();
+      closeModal('resetConfirmModal');
+      showToast("All swimmers reset to Pending for the new session day!", "🔄");
+    });
+
+    /* Export Attendance to CSV */
+    document.getElementById('btnExportCsv').addEventListener('click', () => {
+      if (!requireAdminAuth("export roster")) return;
+
+      const headers = ["Swimmer Name", "Phone", "Recurring Day", "Time Slot", "Lane", "Level", "Instructor", "Monthly Session (1-4)", "Status", "Notes"];
+      const rows = appState.students.map(s => [
+        `"${(s.name || '').replace(/"/g, '""')}"`,
+        `"${(s.phone || '').replace(/"/g, '""')}"`,
+        `"${(s.recurringDay || 'Friday').replace(/"/g, '""')}"`,
+        `"${(s.sessionTime || '').replace(/"/g, '""')}"`,
+        `"${(s.lane || '').replace(/"/g, '""')}"`,
+        `"${(s.level || '').replace(/"/g, '""')}"`,
+        `"${(s.instructor || '').replace(/"/g, '""')}"`,
+        `"Class ${s.sessionNumber || 1} of 4"`,
+        `"${(s.status || 'pending').toUpperCase()}"`,
+        `"${(s.notes || '').replace(/"/g, '""')}"`
+      ]);
+
+      const csvContent = "\uFEFF" + [headers.join(","), ...rows.map(e => e.join(","))].join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      const filenameDate = document.getElementById('sessionDateInput')?.value || getTodayDateStr();
+      link.setAttribute("href", url);
+      link.setAttribute("download", `H2O_Swimming_Attendance_${filenameDate}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast("Roster exported to CSV file successfully! 📥");
+    });
+
+    /* Instructors management */
+    window.removeCoach = function(index) {
+      if (!requireAdminAuth("manage coaches")) return;
+      const coachToRemove = appState.instructors[index].name;
+      if (appState.instructors.length <= 1) {
+        showToast("You need at least one coach in the system.", "⚠️");
+        return;
+      }
+      appState.instructors.splice(index, 1);
+      appState.students.forEach(s => {
+        if (s.instructor === coachToRemove) {
+          s.instructor = appState.instructors[0].name;
+        }
+      });
+      saveStorage();
+      renderInstructorsDropdowns();
+      renderRoster();
+      showToast(`Removed ${coachToRemove}`);
+    };
+
+    document.getElementById('btnAddCoach').addEventListener('click', () => {
+      if (!requireAdminAuth("add new coach")) return;
+      const nameInput = document.getElementById('newCoachName');
+      const phoneInput = document.getElementById('newCoachPhone');
+      const name = nameInput.value.trim();
+      const phone = phoneInput.value.trim();
+
+      if (!name) {
+        showToast("Please enter coach name", "⚠️");
+        return;
+      }
+      if (appState.instructors.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        showToast("Coach name already exists", "⚠️");
+        return;
+      }
+
+      appState.instructors.push({
+        name: name,
+        phone: phone || '+60123456789'
+      });
+
+      nameInput.value = '';
+      phoneInput.value = '';
+      saveStorage();
+      renderInstructorsDropdowns();
+      renderRoster();
+      showToast(`Added ${name}!`);
+    });
+
+    /* Security & Admin Login Logic (username: admin, password: admin123) */
+    function updateAdminUI() {
+      const badge = document.getElementById('adminStatusBadge');
+      const logoutBtn = document.getElementById('btnAdminLogout');
+      const text = document.getElementById('adminStatusText');
+      const dot = document.getElementById('adminStatusDot');
+
+      if (isAdminLoggedIn) {
+        badge.className = 'admin-auth-indicator';
+        dot.textContent = '🔓';
+        text.textContent = 'Coach Logged In';
+        logoutBtn.style.display = 'inline-flex';
+      } else {
+        badge.className = 'admin-auth-indicator locked';
+        dot.textContent = '🔒';
+        text.textContent = 'Student Mode';
+        logoutBtn.style.display = 'none';
+      }
+    }
+
+    function requireAdminAuth(actionDescription = "perform this action") {
+      if (isAdminLoggedIn) return true;
+      document.getElementById('loginErrorMessage').style.display = 'none';
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+      openModal('coachLoginModal');
+      setTimeout(() => {
+        document.getElementById('loginUsername').focus();
+      }, 150);
+      showToast(`Coach login required to ${actionDescription}`, "🔒");
+      return false;
+    }
+
+    function submitCoachLogin() {
+      const u = document.getElementById('loginUsername').value.trim();
+      const p = document.getElementById('loginPassword').value.trim();
+
+      if (u === 'admin' && p === 'admin123') {
+        isAdminLoggedIn = true;
+        sessionStorage.setItem('H2O_ADMIN_AUTH', 'true');
+        closeModal('coachLoginModal');
+        updateAdminUI();
+        showToast("Coach authenticated successfully! Welcome back.", "✓");
+        switchToCoachMode();
+      } else {
+        const errMsg = document.getElementById('loginErrorMessage');
+        errMsg.style.display = 'block';
+        errMsg.textContent = "⚠️ Incorrect username or password. Please try again.";
+      }
+    }
+
+    document.getElementById('btnSubmitCoachLogin').addEventListener('click', submitCoachLogin);
+
+    // Support Enter key on login fields
+    ['loginUsername', 'loginPassword'].forEach(fieldId => {
+      document.getElementById(fieldId).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitCoachLogin();
+        }
+      });
+    });
+
+    document.getElementById('btnAdminLogout').addEventListener('click', () => {
+      isAdminLoggedIn = false;
+      sessionStorage.removeItem('H2O_ADMIN_AUTH');
+      updateAdminUI();
+      switchToSwimmerMode();
+      showToast("Coach logged out. Switched to Swimmer Mode.", "🔒");
+    });
+
+    function switchToCoachMode() {
+      if (!isAdminLoggedIn) {
+        requireAdminAuth("view coach roster");
+        return;
+      }
+      tabCoachMode.classList.add('active');
+      tabSwimmerMode.classList.remove('active');
+      coachViewSection.style.display = 'block';
+      swimmerViewSection.style.display = 'none';
+      renderRoster();
+    }
+
+    function switchToSwimmerMode() {
+      tabSwimmerMode.classList.add('active');
+      tabCoachMode.classList.remove('active');
+      coachViewSection.style.display = 'none';
+      swimmerViewSection.style.display = 'block';
+      renderTitles();
+      renderSwimmerSelfCheckinPortal();
+    }
+
+    /* Mode Switching (Coach View vs Swimmer Self-Service) */
+    const tabCoachMode = document.getElementById('tabCoachMode');
+    const tabSwimmerMode = document.getElementById('tabSwimmerMode');
+    const coachViewSection = document.getElementById('coachViewSection');
+    const swimmerViewSection = document.getElementById('swimmerViewSection');
+
+    tabCoachMode.addEventListener('click', () => {
+      if (!isAdminLoggedIn) {
+        requireAdminAuth("access the coach roster");
+      } else {
+        switchToCoachMode();
+      }
+    });
+
+    tabSwimmerMode.addEventListener('click', () => {
+      switchToSwimmerMode();
+    });
+
+    /* Coach Google Calendar Event Generator */
+    document.getElementById('btnCoachCalendarReminder').addEventListener('click', () => {
+      const dateVal = document.getElementById('sessionDateInput').value;
+      const slotVal = document.getElementById('sessionTimeSlot').value;
+      const totalSwimmers = appState.students.length;
+      const presentCount = appState.students.filter(s => s.status === 'present').length;
+      const feeDueCount = appState.students.filter(s => s.sessionNumber >= 4).length;
+
+      const calTitle = `🏊 COACH SCHEDULE: ${appState.classTitle} (${slotVal})`;
+      let calDetails = `Swimming Class Session for Coaches & Instructors\n`;
+      calDetails += `Academy: ${appState.classTitle}\n`;
+      calDetails += `Time Slot: ${slotVal}\n`;
+      calDetails += `Total Roster: ${totalSwimmers} Swimmers (${presentCount} in pool)\n`;
+      if (feeDueCount > 0) {
+        calDetails += `⚠️ ${feeDueCount} Swimmers on 4th class (fee renewal due!)\n\n`;
+      }
+      calDetails += `Active Coaches:\n` + appState.instructors.map(c => `• ${c.name} (${c.phone})`).join('\n');
+
+      const url = generateGoogleCalendarUrl(calTitle, dateVal, slotVal, calDetails, appState.poolLocation);
+      window.open(url, '_blank');
+      showToast("Opening Google Calendar to save coach session!");
+    });
+
+    /* Search and Day Filters on Swimmer Portal */
+    document.getElementById('portalSearchInput')?.addEventListener('input', renderSwimmerSelfCheckinPortal);
+
+    document.querySelectorAll('.day-filter-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        document.querySelectorAll('.day-filter-chip').forEach(c => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentPortalDayFilter = e.currentTarget.getAttribute('data-day');
+        renderSwimmerSelfCheckinPortal();
+      });
+    });
+
+    /* Mark all present button */
+    document.getElementById('btnMarkAllPresent').addEventListener('click', () => {
+      if (!requireAdminAuth("mark all present")) return;
+      const coachFilter = document.getElementById('filterInstructorSelect').value;
+      appState.students.forEach(s => {
+        if (coachFilter === 'ALL' || s.instructor === coachFilter) {
+          s.status = 'present';
+        }
+      });
+      saveStorage();
+      renderRoster();
+      playBeep(650, 'sine', 0.15);
+      showToast("Marked students as In Pool / Present!");
+    });
+
+    /* Timer Logic */
+    function formatTime(totalSec) {
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+      const display = document.getElementById('timerDisplay');
+      display.textContent = formatTime(timerRemainingSeconds);
+
+      const status = document.getElementById('timerStatusLabel');
+      const playIcon = document.getElementById('timerPlayIcon');
+      const btnText = document.getElementById('timerBtnText');
+
+      if (isTimerRunning) {
+        status.textContent = 'Running Drill';
+        status.style.color = '#38bdf8';
+        btnText.textContent = 'Pause';
+        playIcon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+      } else {
+        if (timerRemainingSeconds === 0) {
+          status.textContent = 'Session Finished!';
+          status.style.color = '#ef4444';
+        } else if (timerRemainingSeconds < timerTotalSeconds) {
+          status.textContent = 'Paused';
+          status.style.color = '#f59e0b';
+        } else {
+          status.textContent = 'Ready';
+          status.style.color = '#38bdf8';
+        }
+        btnText.textContent = 'Start Timer';
+        playIcon.innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+      }
+    }
+
+    function startTimer() {
+      if (timerRemainingSeconds <= 0) {
+        timerRemainingSeconds = timerTotalSeconds;
+      }
+      isTimerRunning = true;
+      updateTimerUI();
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        if (timerRemainingSeconds > 0) {
+          timerRemainingSeconds--;
+          updateTimerUI();
+          if (timerRemainingSeconds === 0) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            updateTimerUI();
+            playTripleAlert();
+            showToast("⏰ Time is up! Swimming session completed.", "🔔");
+          }
+        }
+      }, 1000);
+    }
+
+    function pauseTimer() {
+      isTimerRunning = false;
+      clearInterval(timerInterval);
+      updateTimerUI();
+    }
+
+    function toggleTimer() {
+      if (isTimerRunning) {
+        pauseTimer();
+      } else {
+        startTimer();
+      }
+    }
+
+    function resetTimer() {
+      pauseTimer();
+      timerRemainingSeconds = timerTotalSeconds;
+      updateTimerUI();
+      showToast("Timer reset to " + formatTime(timerTotalSeconds));
+    }
+
+    window.setTimerPreset = function(minutes) {
+      document.getElementById('timerMinutesInput').value = minutes;
+      document.getElementById('timerSecondsInput').value = 0;
+    };
+
+    /* Timer Controls Listeners */
+    document.getElementById('btnTimerStartPause').addEventListener('click', toggleTimer);
+    document.getElementById('timerDisplay').addEventListener('click', toggleTimer);
+    document.getElementById('btnTimerReset').addEventListener('click', resetTimer);
+    
+    document.getElementById('btnTimerAdd5').addEventListener('click', () => {
+      timerRemainingSeconds += 5 * 60;
+      timerTotalSeconds += 5 * 60;
+      updateTimerUI();
+      showToast("+5 Minutes added to pool timer");
+    });
+
+    document.getElementById('btnTimerTestBeep').addEventListener('click', () => {
+      playTripleAlert();
+      showToast("Poolside buzzer sound tested! 🔔");
+    });
+
+    /* Modals Open / Close Helper */
+    function openModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeModal(modalId) {
+      const modal = document.getElementById(modalId);
+      if (modal) modal.classList.remove('open');
+    }
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const modalId = btn.getAttribute('data-close');
+        closeModal(modalId);
+      });
+    });
+
+    // Close on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('open');
+        }
+      });
+    });
+
+    /* Title Modal Handlers */
+    document.getElementById('btnEditTitleModal').addEventListener('click', () => {
+      if (!requireAdminAuth("change class title")) return;
+      document.getElementById('editClassTitleInput').value = appState.classTitle;
+      document.getElementById('editSubTitleInput').value = appState.classSubtitle;
+      openModal('titleModal');
+    });
+
+    document.getElementById('btnSaveTitle').addEventListener('click', () => {
+      if (!requireAdminAuth("save class title")) return;
+      const titleVal = document.getElementById('editClassTitleInput').value.trim();
+      const subVal = document.getElementById('editSubTitleInput').value.trim();
+      if (titleVal) {
+        appState.classTitle = titleVal;
+        appState.classSubtitle = subVal || "Adult Swimming Academy";
+        saveStorage();
+        renderTitles();
+        closeModal('titleModal');
+        showToast("Class title updated!");
+      }
+    });
+
+    /* Timer Modal Handlers */
+    document.getElementById('btnEditTimerModal').addEventListener('click', () => {
+      if (!requireAdminAuth("edit timer settings")) return;
+      document.getElementById('timerMinutesInput').value = appState.timerDurationMinutes || 45;
+      document.getElementById('timerSecondsInput').value = appState.timerDurationSeconds || 0;
+      openModal('timerModal');
+    });
+
+    document.getElementById('btnSaveTimer').addEventListener('click', () => {
+      if (!requireAdminAuth("save timer duration")) return;
+      const min = parseInt(document.getElementById('timerMinutesInput').value, 10) || 0;
+      const sec = parseInt(document.getElementById('timerSecondsInput').value, 10) || 0;
+      appState.timerDurationMinutes = min;
+      appState.timerDurationSeconds = sec;
+      timerTotalSeconds = (min * 60) + sec;
+      timerRemainingSeconds = timerTotalSeconds;
+      
+      pauseTimer();
+      updateTimerUI();
+      document.getElementById('timerModeLabel').textContent = `Target: ${min} Min ${sec ? sec + ' Sec' : ''} Session`;
+      saveStorage();
+      closeModal('timerModal');
+      showToast("Class timer duration set!");
+    });
+
+    /* Instructors Modal Handlers */
+    document.getElementById('btnInstructorsModal').addEventListener('click', () => {
+      if (!requireAdminAuth("manage instructors")) return;
+      renderInstructorsDropdowns();
+      openModal('instructorsModal');
+    });
+
+    /* Add/Edit Swimmer Modal */
+    document.getElementById('btnOpenAddStudentModal').addEventListener('click', () => {
+      if (!requireAdminAuth("add new swimmer")) return;
+      document.getElementById('studentModalHeading').innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Add Adult Swimmer (4 Classes/Month Package)
+      `;
+      document.getElementById('editStudentId').value = '';
+      document.getElementById('studentFullName').value = '';
+      
+      const currentDateVal = document.getElementById('sessionDateInput')?.value || getTodayDateStr();
+      document.getElementById('studentDate').value = currentDateVal;
+      document.getElementById('studentRecurringDay').value = 'Friday';
+      document.getElementById('studentSessionNumber').value = '1';
+
+      const timeSlotSelect = document.getElementById('studentTimeSlot');
+      timeSlotSelect.value = '09:00 AM - 09:45 AM';
+      document.getElementById('customTimeGroup').style.display = 'none';
+      document.getElementById('studentCustomTime').value = '';
+
+      document.getElementById('studentPhone').value = '';
+      document.getElementById('studentLane').value = 'Lane 1';
+      document.getElementById('studentInitialNotes').value = '';
+      openModal('studentModal');
+    });
+
+    window.openEditStudentModal = function(studentId) {
+      if (!requireAdminAuth("edit swimmer profile or slot")) return;
+      const s = appState.students.find(x => x.id === studentId);
+      if (!s) return;
+      document.getElementById('studentModalHeading').innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit Swimmer Weekly Slot & Progress
+      `;
+      document.getElementById('editStudentId').value = s.id;
+      document.getElementById('studentFullName').value = s.name;
+      document.getElementById('studentDate').value = s.sessionDate || getTodayDateStr();
+      document.getElementById('studentRecurringDay').value = s.recurringDay || 'Friday';
+      document.getElementById('studentSessionNumber').value = s.sessionNumber || 1;
+
+      const timeSlotSelect = document.getElementById('studentTimeSlot');
+      const savedTime = s.sessionTime || '09:00 AM - 09:45 AM';
+      let foundOption = false;
+      for (let i = 0; i < timeSlotSelect.options.length; i++) {
+        if (timeSlotSelect.options[i].value === savedTime) {
+          timeSlotSelect.selectedIndex = i;
+          foundOption = true;
+          break;
+        }
+      }
+      if (!foundOption) {
+        timeSlotSelect.value = 'CUSTOM';
+        document.getElementById('customTimeGroup').style.display = 'block';
+        document.getElementById('studentCustomTime').value = savedTime;
+      } else {
+        document.getElementById('customTimeGroup').style.display = 'none';
+        document.getElementById('studentCustomTime').value = '';
+      }
+
+      document.getElementById('studentPhone').value = s.phone || '';
+      document.getElementById('studentLane').value = s.lane || 'Lane 1';
+      document.getElementById('studentLevel').value = s.level || 'Beginner (Water Fear / Floating)';
+      document.getElementById('studentInstructorSelect').value = s.instructor || appState.instructors[0].name;
+      document.getElementById('studentInitialNotes').value = s.notes || '';
+      openModal('studentModal');
+    };
+
+    // Toggle custom time slot field if 'CUSTOM' selected
+    document.getElementById('studentTimeSlot').addEventListener('change', (e) => {
+      const customGroup = document.getElementById('customTimeGroup');
+      if (e.target.value === 'CUSTOM') {
+        customGroup.style.display = 'block';
+        document.getElementById('studentCustomTime').focus();
+      } else {
+        customGroup.style.display = 'none';
+      }
+    });
+
+    document.getElementById('btnSaveStudent').addEventListener('click', () => {
+      if (!requireAdminAuth("save swimmer data")) return;
+      const editId = document.getElementById('editStudentId').value;
+      const name = document.getElementById('studentFullName').value.trim();
+      if (!name) {
+        showToast("Swimmer full name is required", "⚠️");
+        return;
+      }
+
+      const sessionDate = document.getElementById('studentDate').value || getTodayDateStr();
+      const recurringDay = document.getElementById('studentRecurringDay').value || 'Friday';
+      const sessionNumber = parseInt(document.getElementById('studentSessionNumber').value, 10) || 1;
+      const slotSelectVal = document.getElementById('studentTimeSlot').value;
+      let sessionTime = slotSelectVal;
+      if (slotSelectVal === 'CUSTOM') {
+        sessionTime = document.getElementById('studentCustomTime').value.trim() || '09:00 AM - 09:45 AM';
+      }
+
+      const phone = document.getElementById('studentPhone').value.trim();
+      const lane = document.getElementById('studentLane').value.trim() || 'Lane 1';
+      const level = document.getElementById('studentLevel').value;
+      const instructor = document.getElementById('studentInstructorSelect').value || appState.instructors[0].name;
+      const notes = document.getElementById('studentInitialNotes').value.trim();
+
+      if (editId) {
+        const student = appState.students.find(s => s.id === editId);
+        if (student) {
+          student.name = name;
+          student.recurringDay = recurringDay;
+          student.sessionDate = sessionDate;
+          student.sessionTime = sessionTime;
+          student.sessionNumber = sessionNumber;
+          student.phone = phone;
+          student.lane = lane;
+          student.level = level;
+          student.instructor = instructor;
+          student.notes = notes;
+          showToast(`Updated weekly schedule (${recurringDay}) for ${name}`);
+        }
+      } else {
+        const newStudent = {
+          id: 's_' + Date.now(),
+          name,
+          recurringDay,
+          sessionDate,
+          sessionTime,
+          sessionNumber,
+          phone,
+          lane,
+          level,
+          instructor,
+          status: 'present',
+          notes
+        };
+        appState.students.unshift(newStudent);
+        showToast(`Added ${name} for every ${recurringDay} (${sessionTime})!`);
+      }
+
+      saveStorage();
+      renderRoster();
+      closeModal('studentModal');
+    });
+
+    /* Share / Copy WhatsApp Report */
+    document.getElementById('btnShareWhatsApp').addEventListener('click', () => {
+      const date = document.getElementById('sessionDateInput').value;
+      const slot = document.getElementById('sessionTimeSlot').value;
+      const total = appState.students.length;
+      const present = appState.students.filter(s => s.status === 'present').length;
+      const late = appState.students.filter(s => s.status === 'late').length;
+      const absent = appState.students.filter(s => s.status === 'absent').length;
+      const feeDueStudents = appState.students.filter(s => s.sessionNumber >= 4);
+
+      let report = `🏊 *${appState.classTitle.toUpperCase()}* 🏊\n`;
+      report += `📋 *${appState.classSubtitle}*\n`;
+      report += `📅 Report Date: ${date} (${slot})\n`;
+      report += `⏱ Class Duration: ${appState.timerDurationMinutes} mins\n`;
+      report += `------------------------------------\n`;
+      report += `📊 *ATTENDANCE SUMMARY*\n`;
+      report += `✅ In Pool: ${present}/${total}\n`;
+      if (late > 0) report += `⏰ Late: ${late}\n`;
+      if (absent > 0) report += `❌ Absent: ${absent}\n`;
+      report += `------------------------------------\n`;
+
+      if (feeDueStudents.length > 0) {
+        report += `💳 *FEE RENEWAL REMINDER (4th Class Completed)*:\n`;
+        feeDueStudents.forEach(s => {
+          report += `  ⚠️ ${s.name} (Every ${s.recurringDay} ${s.sessionTime}) - Class 4/4\n`;
+        });
+        report += `------------------------------------\n`;
+      }
+
+      report += `👥 *SWIMMER ROSTER (WEEKLY SLOTS):*\n`;
+
+      appState.instructors.forEach(coach => {
+        const coachStudents = appState.students.filter(s => s.instructor === coach.name);
+        if (coachStudents.length > 0) {
+          report += `\n👨‍🏫 *${coach.name}:*\n`;
+          coachStudents.forEach(s => {
+            const icon = s.status === 'present' ? '✅' :
+                         s.status === 'late' ? '⏰' :
+                         s.status === 'absent' ? '❌' : '⚪';
+            const noteStr = s.notes ? ` - (${s.notes})` : '';
+            const scheduleStr = ` [Every ${s.recurringDay || 'Fri'} @ ${s.sessionTime || '09:00 AM'}]`;
+            const classCountStr = ` (Class ${s.sessionNumber || 1}/4)`;
+            report += `  ${icon} ${s.name}${classCountStr} - ${s.lane}${scheduleStr}${noteStr}\n`;
+          });
+        }
+      });
+
+      report += `\nGenerated via H2O Attendance System.`;
+
+      document.getElementById('shareTextarea').value = report;
+      openModal('shareModal');
+    });
+
+    document.getElementById('btnCopyReportToClipboard').addEventListener('click', () => {
+      const textarea = document.getElementById('shareTextarea');
+      textarea.select();
+      textarea.setSelectionRange(0, 99999);
+      try {
+        document.execCommand('copy');
+        showToast("Summary copied to clipboard! Ready to paste into WhatsApp.");
+      } catch (err) {
+        showToast("Please manually copy the text from the box.", "⚠️");
+      }
+    });
+
+    /* Filters Event Listeners */
+    document.getElementById('searchInput').addEventListener('input', renderRoster);
+    document.getElementById('filterInstructorSelect').addEventListener('change', renderRoster);
+    document.getElementById('filterStatusSelect').addEventListener('change', renderRoster);
+    document.getElementById('filterDateSelect')?.addEventListener('change', renderRoster);
+    document.getElementById('filterPackageSelect')?.addEventListener('change', renderRoster);
+
+    /* Initialization */
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStorage();
+
+      // Set today's date in date picker
+      const today = getTodayDateStr();
+      const dateInput = document.getElementById('sessionDateInput');
+      if (dateInput) {
+        dateInput.value = today;
+        dateInput.addEventListener('change', () => {
+          renderTitles();
+          renderRoster();
+        });
+      }
+
+      const slotSelect = document.getElementById('sessionTimeSlot');
+      if (slotSelect) {
+        slotSelect.addEventListener('change', () => {
+          renderTitles();
+          renderRoster();
+        });
+      }
+
+      renderTitles();
+      renderInstructorsDropdowns();
+      renderRoster();
+      updateTimerUI();
+      updateAdminUI();
+
+      // Default directly to Swimmer view unless coach was already authenticated
+      if (!isAdminLoggedIn) {
+        switchToSwimmerMode();
+      } else {
+        switchToCoachMode();
+      }
+
+      document.getElementById('timerModeLabel').textContent = `Target: ${appState.timerDurationMinutes} Minutes Session`;
+    });
+  </script>
+</body>
+</html>
